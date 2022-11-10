@@ -1,0 +1,49 @@
+dotplot<-function(formula=y~x, data=data, points="mean", whiskers="SD", jitter=0.5, xlim=c(0.5, max(as.numeric(as.factor(x)))+0.5), las=0, ylab="y", xlab="x", col=rgb(0,0,0,0.25), linecol="red", pch=19){
+	se<-function (x) { 
+		sd(x)/sqrt(sum(!is.na(x)))
+		} 
+	CI_95<-function (x) { 
+		se<-sd(x)/sqrt(sum(!is.na(x)))
+		u95<-mean(x, na.rm=T)+se*1.96
+		l95<-mean(x, na.rm=T)-se*1.96
+		c(l95, u95)
+	}	
+	y<-data[,c(all.vars(formula)[1])]
+	x<-data[,c(all.vars(formula)[2])]
+	plot(y~jitter(as.numeric(as.factor(x)), factor=jitter), xlim=xlim, las=las, ylab=ylab, xlab=xlab, xaxt="n", col=col, pch=pch)
+	axis(side=1, at=c(as.numeric(as.factor(unique(x)))), labels=unique(x))
+	mean<-aggregate(y~x, data, mean)$y
+	median<-aggregate(y~x, data, median)$y
+	points(x=c(1:length(mean)), y=c(mean), col=linecol, pch=16, cex=1.5)
+	SD<-aggregate(y~x, data, sd)$y
+	quantiles<-aggregate(y~x, data, quantile)$y
+	SE<-aggregate(y~x, data, se)$y
+	CI<-aggregate(y~x, data, CI_95)$y
+	upper_SD<-mean+SD
+	lower_SD<-mean-SD
+	upper_Q<-quantiles[,4]
+	lower_Q<-quantiles[,2]
+	upper_SE<-mean+SE
+	lower_SE<-mean-SE
+	upper_CI<-CI[,1]
+	lower_CI<-CI[,2]
+	if (points=="mean"){centre=mean}
+	if (points=="median"){centre=median}
+	if (whiskers=="SD"){
+		lower_bounds=lower_SD
+		upper_bounds=upper_SD
+		}
+	if (whiskers=="IQR"){
+		lower_bounds=lower_Q
+		upper_bounds=upper_Q
+		}
+	if (whiskers=="SE"){
+		lower_bounds=lower_SE
+		upper_bounds=upper_SE
+		}	
+	if (whiskers=="CI"){
+		lower_bounds=lower_CI
+		upper_bounds=upper_CI
+		}	
+	arrows(x0=1:length(centre), y0=lower_bounds, x1=1:length(centre), y1=upper_bounds, col=linecol, angle=90, code=3, length=0.1)
+}
