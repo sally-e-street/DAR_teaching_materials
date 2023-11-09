@@ -1,4 +1,4 @@
-dotplot<-function(formula=y~x, data=data, points="mean", whiskers="SD", jitter=0.5, xlim=c(0.5, max(as.numeric(as.factor(x)))+0.5), las=0, ylab="y", xlab="x", col=rgb(0,0,0,0.25), linecol="red", pch=19){
+dotplot<-function(formula=y~x, data=data, points="mean", whiskers="SD", jitter=0.5, xlim=c(0.5, max(as.numeric(as.factor(x)), na.rm=T)+0.5), las=0, ylab="y", xlab="x", col=rgb(0,0,0,0.25), linecol="red", pch=19){
 	se<-function (x) { 
 		sd(x)/sqrt(sum(!is.na(x)))
 		} 
